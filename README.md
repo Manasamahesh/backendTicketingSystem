@@ -20,7 +20,6 @@ Designed flow of the node server:
    -  For viewing the passengerDetails - Fetch passenger Details - ticket number is mandatory fields
    -  For resting the tickets status to open - reset the server - there is no mandatory fields
 
-   -   postman calls -> [Uploading backendTicketingSystem.postman_collection.json…]()
 
 
    
