@@ -5,7 +5,7 @@
   "main": "ticketSystemAPI.js",
   "scripts": {
     "start": "node ticketSystemAPI.js",
-    "startdb": "node dataCreation.js",
+    "startdb": "node databaseCreation.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
