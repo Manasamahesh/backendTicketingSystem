@@ -323,8 +323,23 @@ eventEmitter.on("failedEvents", (error) => {
   console.error("Failed:", error.message);
 });
 
-// function to delete the table ticketinfo from database
+// function to delete data from the table ticketinfo from database
 app.delete("/resetTable", async (req, res) => {
+  try {
+    const result = await pool.query("DELETE FROM ticketInfo;");
+    return res
+      .status(200)
+      .json({ message: "table reset initiated by admin", result });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
+// function to delete the table ticketinfo from database
+app.delete("/deleteTable", async (req, res) => {
   try {
     const result = await pool.query("DROP TABLE ticketInfo;");
     return res
