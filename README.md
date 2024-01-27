@@ -8,6 +8,6 @@ Designed flow of the node server:
 # Important Points to be noted
 
 * The ticket number consists of eight digits and is randomly generated. Therefore, when making Postman calls request such as fetchTicketStatus, fetchPassengerDetails and UpdateTicketStatus, sample data to be updated with new ticket number generated at the time of calling ticket creation endpoint when testing the above mentioned requests.
-* For Server reset endpoint only allowed admin user can do reset of the tickets, so those eligible users I have add into the adminConfigJson file.
+* Only admin users are allowed to reset tickets for the server reset endpoint. Therefore, I have added the eligible users to the adminConfigJson file.
 
    
