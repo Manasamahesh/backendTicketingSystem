@@ -12,15 +12,15 @@ Designed flow of the node server:
 * As part of the ticket system status is maintained, which have field as open,closed to represent ticket is open state and close state respectively.
 
 
--   # For creating new ticket - createnewTickets Request -> passenger Details is required
--   # For updating tickets - three forms which status only update, status and passengerDetails update, passengerDetails update -> ticketnumber is mandatory in all fields 
--   # For viewing the ticket status - Fetch ticket status -> ticketnumber and email id is mandatory fields
--   # For viewing the open tickets - Fetch open tickets - there is no mandatory fields
--   # For viewing the closed tickets - Fetch closed tickets - there is no mandatory fields
--   # For viewing the passengerDetails - Fetch passenger Details - ticket number is mandatory fields
--   # For resting the tickets status to open - reset the server - there is no mandatory fields
+   -   # For creating new ticket - createnewTickets Request -> passenger Details is required
+   -   # For updating tickets - three forms which status only update, status and passengerDetails update, passengerDetails update -> ticketnumber is mandatory in all fields 
+   -   # For viewing the ticket status - Fetch ticket status -> ticketnumber and email id is mandatory fields
+   -   # For viewing the open tickets - Fetch open tickets - there is no mandatory fields
+   -   # For viewing the closed tickets - Fetch closed tickets - there is no mandatory fields
+   -   # For viewing the passengerDetails - Fetch passenger Details - ticket number is mandatory fields
+   -   # For resting the tickets status to open - reset the server - there is no mandatory fields
 
--   postman calls -> [Uploading backendTicketingSystem.postman_collection.json…]()
+   -   postman calls -> [Uploading backendTicketingSystem.postman_collection.json…]()
 
 
    
