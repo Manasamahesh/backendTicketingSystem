@@ -8,7 +8,7 @@ const {
 } = require("./commonFunction");
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // PostgreSQL connection configuration
 const pool = new Pool({
@@ -172,7 +172,8 @@ app.get("/tickets/closed", async (req, res) => {
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
     } else {
-      res.status(200).json({ info: "There is no closed tickets" });
+      eventEmitter.emit("failedEvents", new Error("There is no closed tickets"));
+      res.status(400).json({ info: "There is no closed tickets" });
     }
   } catch (error) {
     console.error(error);
@@ -190,7 +191,8 @@ app.get("/tickets/open", async (req, res) => {
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
     } else {
-      res.status(200).json({ info: "There is no open tickets" });
+      eventEmitter.emit("failedEvents", new Error("There is no open tickets"));
+      res.status(400).json({ info: "There is no open tickets" });
     }
   } catch (error) {
     console.error(error);
