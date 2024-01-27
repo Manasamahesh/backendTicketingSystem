@@ -66,7 +66,7 @@ eventEmitter.on("newticketgotcreated", (insertedTicket) => {
 // Update Ticket Status
 app.put("/tickets/updateTicketStatus", async (req, res) => {
   try {
-    let mandatoryFields = ["ticketNumber"];
+    let mandatoryFields = req.body.hasOwnProperty('passengerDetails')? ["ticketNumber","passengerDetails"]:["ticketNumber"];
     const validationResult = fieldValidation(mandatoryFields, req.body);
     if (validationResult.status) {
       return res
@@ -76,7 +76,9 @@ app.put("/tickets/updateTicketStatus", async (req, res) => {
     const { ticketNumber, status, passengerDetails } = req.body;
     let result;
     // update ticketinfo if received to update both status and passengerDetails
-    if (status && passengerDetails) {
+    // here I am checking status as property because status could be in the following values "","Open","Closed"
+    // However in the case of the passengerDetails I update in the database only if key and values present in the request
+    if (req.body.hasOwnProperty('status') && req.body.hasOwnProperty('passengerDetails')) {
       passengerDetails.ticketlastUpdationTimeStamp = new Date(); // records timeinfo about last updated ticket details for audit.
       let booleanvalue = true;
       result = await pool.query(
@@ -112,14 +114,14 @@ app.put("/tickets/updateTicketStatus", async (req, res) => {
       );
     }
     // this flow executes when only request received for updating only status
-    if (status) {
+    if (req.body.hasOwnProperty('status')) {
       result = await pool.query(
         `UPDATE ticketinfo SET status = $1 WHERE ticketnumber = $2 RETURNING *`,
         [status, ticketNumber]
       );
     }
     // this flow executes when request received only for updating passengerDetails.
-    if (passengerDetails) {
+    if (req.body.hasOwnProperty('passengerDetails')) {
       passengerDetails.ticketlastUpdationTimeStamp = new Date(); // records timeinfo about last updated ticket details for audit.
       let booleanvalue = true;
       result = await pool.query(
