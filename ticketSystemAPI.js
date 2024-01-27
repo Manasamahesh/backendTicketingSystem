@@ -66,7 +66,7 @@ eventEmitter.on("newticketgotcreated", (insertedTicket) => {
 // Update Ticket Status
 app.put("/tickets/updateTicketStatus", async (req, res) => {
   try {
-    let mandatoryFields = ["ticketNumber", "status", "passengerDetails"];
+    let mandatoryFields = ["ticketNumber"];
     const validationResult = fieldValidation(mandatoryFields, req.body);
     if (validationResult.status) {
       return res
@@ -74,11 +74,13 @@ app.put("/tickets/updateTicketStatus", async (req, res) => {
         .json({ error: `${validationResult.fields} - Fields are missing` });
     }
     const { ticketNumber, status, passengerDetails } = req.body;
-    passengerDetails.ticketlastUpdationTimeStamp = new Date(); // records timeinfo about last updated ticket details for audit.
-    let booleanvalue = true;
-    const result = await pool.query(
-      `UPDATE ticketinfo SET status = $1, 
-    passengerDetails = jsonb_set(jsonb_set(jsonb_set(jsonb_set(
+    let result;
+    // update ticketinfo if received to update both status and passengerDetails
+    if (status && passengerDetails) {
+      passengerDetails.ticketlastUpdationTimeStamp = new Date(); // records timeinfo about last updated ticket details for audit.
+      let booleanvalue = true;
+      result = await pool.query(
+        `UPDATE ticketinfo SET status = $1,passengerDetails = jsonb_set(jsonb_set(jsonb_set(jsonb_set(
         jsonb_set(
             jsonb_set(
                 jsonb_set(
@@ -106,8 +108,52 @@ app.put("/tickets/updateTicketStatus", async (req, res) => {
         '"${passengerDetails.boardingTime}"',${booleanvalue}),
         '{ticketlastUpdationTimeStamp}',
         '"${passengerDetails.ticketlastUpdationTimeStamp}"',${booleanvalue}) WHERE ticketnumber = $2 RETURNING *`,
-      [status, ticketNumber]
-    );
+        [status, ticketNumber]
+      );
+    }
+    // this flow executes when only request received for updating only status
+    if (status) {
+      result = await pool.query(
+        `UPDATE ticketinfo SET status = $1 WHERE ticketnumber = $2 RETURNING *`,
+        [status, ticketNumber]
+      );
+    }
+    // this flow executes when request received only for updating passengerDetails.
+    if (passengerDetails) {
+      passengerDetails.ticketlastUpdationTimeStamp = new Date(); // records timeinfo about last updated ticket details for audit.
+      let booleanvalue = true;
+      result = await pool.query(
+        `UPDATE ticketinfo SET passengerDetails = jsonb_set(jsonb_set(jsonb_set(jsonb_set(
+        jsonb_set(
+            jsonb_set(
+                jsonb_set(
+                    passengerDetails, 
+                    '{firstName}', 
+                    '"${passengerDetails.firstName}"',
+                    ${booleanvalue}
+                ),
+                '{lastName}', 
+                '"${passengerDetails.lastName}"',
+                ${booleanvalue}
+            ),
+            '{emailId}', 
+            '"${passengerDetails.emailId}"',
+            ${booleanvalue}
+        ),
+        '{seatNumber}',
+        '"${passengerDetails.seatNumber}"',
+        ${booleanvalue}
+        ),
+        '{boardingPoint}',
+        '"${passengerDetails.boardingPoint}"',${booleanvalue}
+        ),
+        '{boardingTime}',
+        '"${passengerDetails.boardingTime}"',${booleanvalue}),
+        '{ticketlastUpdationTimeStamp}',
+        '"${passengerDetails.ticketlastUpdationTimeStamp}"',${booleanvalue}) WHERE ticketnumber = $1 RETURNING *`,
+        [ticketNumber]
+      );
+    }
     const updatedTicket = result.rows[0];
 
     if (updatedTicket) {
@@ -128,7 +174,9 @@ app.put("/tickets/updateTicketStatus", async (req, res) => {
 //Listen for the 'ticketUpdated' event
 eventEmitter.on("ticketUpdated", (updatedTicket) => {
   console.log(
-    `Ticket ${updatedTicket.ticketnumber} updated. New status: ${updatedTicket.status}`
+    `Ticket ${updatedTicket.ticketnumber} updated. Updated status: ${
+      updatedTicket.status
+    } and passengerDetails: ${JSON.stringify(updatedTicket.passengerdetails)}`
   );
 });
 
